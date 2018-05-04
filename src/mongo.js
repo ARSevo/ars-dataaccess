@@ -24,6 +24,7 @@ const connect = async mongodbConnection => {
 
 module.exports = {
 	connect: connect,
+	mongoose: mongoose,
 	disconnect : async () => await mongoose.disconnect(),
 	mongoConnectionState: mongoConnectionState
 };
