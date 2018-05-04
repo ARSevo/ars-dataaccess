@@ -4,7 +4,7 @@ const util = require('util');
 
 const convertToMultiple = convertor => entities => {
 	if (util.isArray(entities)) {
-		if(entities.length > 1){
+		if (entities.length > 1) {
 			return entities.map(entity => convertor(entity));
 		}
 		return convertor(entities[0]);
@@ -31,6 +31,9 @@ const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, se
 
 const fetch = (mongomodel = mongoose.Model, domainconvertor = entity => entity) => async (condition = new Object()) => {
 	const doc = await mongomodel.find(condition);
+	if (doc.length === 0) {
+		return null;
+	}
 	const domainConvertors = convertToMultiple(domainconvertor);
 	return domainConvertors(doc);
 };
