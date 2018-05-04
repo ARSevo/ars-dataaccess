@@ -1,5 +1,5 @@
 'use strict';
-const mongoose = require('mongoose');
+const { mongoose } = require('./mongo');
 const util = require('util');
 
 const convertToMultiple = convertor => entities => {

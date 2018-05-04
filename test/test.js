@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { mongo, mongohelper, sql } = require('../index');
-const mongoose = require('mongoose');
+const { mongoose } = mongo;
 const testconfig = require('./config');
 
 const testSchema = new mongoose.Schema({
