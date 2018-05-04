@@ -26,12 +26,15 @@ const selector = entity => ({
 	name: entity.name
 });
 const testModelSaver = mongohelper.save(testModel, mongohelper.convertToModels(modelConverter), selector);
+const testModelSaverDefault = mongohelper.save(testModel);
 const testModelRemover = mongohelper.remove(testModel);
+const testModelFetcher = mongohelper.fetch(testModel);
 
 after(async () => {
-	await testModelRemover({name : 'test'});
+	await testModelRemover({ name: 'test' });
 	await mongo.disconnect();
 	await sql.disconnect();
+	process.exit();
 });
 
 describe('mongo', function () {
@@ -42,13 +45,37 @@ describe('mongo', function () {
 			assert.fail(ex);
 		}
 	});
-	it('should save model', async () => {
-		const savedObject = {
-			name : 'test',
-			value : 1
-		};
+	const savedObject = {
+		name: 'test',
+		value: 1
+	};
+	it('should insert model', async () => {
 		const updatedDoc = await testModelSaver(savedObject);
 		assert.equal(updatedDoc, null);
+	});
+	it('should update model', async () => {
+		savedObject.value = 2;
+		const updatedDoc = await testModelSaver(savedObject);
+		assert.notEqual(updatedDoc, null);
+	});
+	it('should fetch model', async () => {
+		const updatedDoc = await testModelFetcher({ name: 'test' });
+		assert.notEqual(updatedDoc, null);
+		assert.equal(updatedDoc.value, 2);
+	});
+	it('should remove model', async () => {
+		const result = await testModelRemover({ name: 'test' });
+		assert.ok(result);
+	});
+	it('should insert model (default saver)', async () => {
+		savedObject.value = 3;
+		const updatedDoc = await testModelSaverDefault(savedObject);
+		assert.equal(updatedDoc, null);
+	});
+	it('should update model (default saver)', async () => {
+		savedObject.value = 4;
+		const updatedDoc = await testModelSaverDefault(savedObject);
+		assert.notEqual(updatedDoc, null);
 	});
 });
 

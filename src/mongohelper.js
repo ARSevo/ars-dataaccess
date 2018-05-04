@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const util = require('util');
 
-const save = (mongomodel = mongoose.Model, modelconvertor = Function(), selector = Function()) => async entities => {
+const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, selector = () => Object.freeze({})) => async entities => {
 	let models = modelconvertor(entities);
 	if (!models) {
 		return;
