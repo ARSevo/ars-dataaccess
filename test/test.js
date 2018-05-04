@@ -1,11 +1,18 @@
 const assert = require('assert');
 const { mongo, mongohelper, sql } = require('../index');
 const mongoose = require('mongoose');
+const testconfig = require('./config');
 
 const testSchema = new mongoose.Schema({
 	name: String,
 	value: Number
 });
+const sqlConnectionParams = new sql.ConnectionParams(
+	testconfig.sqlserverUser,
+	testconfig.sqlserverPwd,
+	testconfig.sqlserverConnection,
+	testconfig.sqlServerDatabase
+);
 
 const testModel = mongoose.model('test', testSchema, 'testCollection');
 const modelConverter = entity => {
@@ -30,7 +37,7 @@ after(async () => {
 describe('mongo', function () {
 	it('should connect to mongo successfully', async () => {
 		try {
-			assert.ok(await mongo.connect(), 'failed to connect');
+			assert.ok(await mongo.connect(testconfig.mongodbConnection), 'failed to connect');
 		} catch (ex) {
 			assert.fail(ex);
 		}
@@ -49,9 +56,9 @@ describe('mongo', function () {
 describe('sql', function () {
 	it('should connect to sql successfully', async () => {
 		try {
-			assert.ok(await sql.connect(), 'failed to connect');
+			assert.ok(await sql.connect(sqlConnectionParams), 'failed to connect');
 		} catch (ex) {
-			assert.fail(ex.message);
+			assert.fail(ex.message || ex);
 		}
 	});
 });

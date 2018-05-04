@@ -1,5 +1,4 @@
 'use strict';
-const { mongodbConnection, environmentCheck } = require('../config');
 const mongoose = require('mongoose');
 
 const mongoConnectionState = {
@@ -11,8 +10,7 @@ const mongoConnectionState = {
 
 const isConnected = state => state === mongoConnectionState.connected || state === mongoConnectionState.connecting;
 
-const connect = async () => {
-	environmentCheck('mongodbconnection');
+const connect = async mongodbConnection => {
 	if (!isConnected(mongoose.connection.readyState)) {
 		mongoose.Promise = require('bluebird');
 		await mongoose.connect(mongodbConnection, {
