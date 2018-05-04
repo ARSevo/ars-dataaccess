@@ -2,8 +2,19 @@
 const mongoose = require('mongoose');
 const util = require('util');
 
+const convertToMultiple = convertor => entities => {
+	if (util.isArray(entities)) {
+		if(entities.length > 1){
+			return entities.map(entity => convertor(entity));
+		}
+		return convertor(entities[0]);
+	}
+	return convertor(entities);
+};
+
 const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, selector = () => Object.freeze({})) => async entities => {
-	let models = modelconvertor(entities);
+	const modelConvertors = convertToMultiple(modelconvertor);
+	let models = modelConvertors(entities);
 	if (!models) {
 		return;
 	}
@@ -18,16 +29,10 @@ const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, se
 	}
 };
 
-const convertToModels = modelconvertor => entities => {
-	if (util.isArray(entities)) {
-		return entities.map(entity => modelconvertor(entity));
-	}
-	return modelconvertor(entities);
-};
-
-const fetch = (mongomodel = mongoose.Model) => async (condition = new Object()) => {
+const fetch = (mongomodel = mongoose.Model, domainconvertor = entity => entity) => async (condition = new Object()) => {
 	const doc = await mongomodel.find(condition);
-	return !doc ? null : doc.length > 1 ? doc : doc[0];
+	const domainConvertors = convertToMultiple(domainconvertor);
+	return domainConvertors(doc);
 };
 
 const remove = (mongomodel = mongoose.Model) => async (condition = new Object()) => {
@@ -36,7 +41,6 @@ const remove = (mongomodel = mongoose.Model) => async (condition = new Object())
 
 module.exports = {
 	save: save,
-	convertToModels: convertToModels,
 	fetch: fetch,
 	remove: remove,
 };

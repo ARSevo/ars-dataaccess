@@ -22,13 +22,22 @@ const modelConverter = entity => {
 	delete model._doc._id;
 	return model;
 };
+
+const domainConvertor = model => {
+	const { _doc } = model;
+	const clone = {..._doc};
+	delete clone._id;
+	delete clone.__v;
+	return clone;
+};
+
 const selector = entity => ({
 	name: entity.name
 });
-const testModelSaver = mongohelper.save(testModel, mongohelper.convertToModels(modelConverter), selector);
+const testModelSaver = mongohelper.save(testModel, modelConverter, selector);
 const testModelSaverDefault = mongohelper.save(testModel);
 const testModelRemover = mongohelper.remove(testModel);
-const testModelFetcher = mongohelper.fetch(testModel);
+const testModelFetcher = mongohelper.fetch(testModel, domainConvertor);
 
 after(async () => {
 	await testModelRemover({ name: 'test' });
