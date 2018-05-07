@@ -1,6 +1,15 @@
 'use strict';
-const { mongoose } = require('./mongo');
 const util = require('util');
+
+/**
+ * Creates a model/document definition for mongo
+ * @param {string} name Model name. Used for collection name as plural
+ * @param {Schema} schema mongoose Model schema
+ */
+const model = mongoose => (name, schema) => {
+	const collectionName = !name.endsWith('s') ? name + 's' : name;
+	return mongoose.model(name, schema, collectionName);
+};
 
 const convertToMultiple = convertor => entities => {
 	if (util.isArray(entities)) {
@@ -12,7 +21,7 @@ const convertToMultiple = convertor => entities => {
 	return convertor(entities);
 };
 
-const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, selector = () => Object.freeze({})) => async entities => {
+const save = (mongomodel, modelconvertor = entity => entity, selector = () => Object.freeze({})) => async entities => {
 	const modelConvertors = convertToMultiple(modelconvertor);
 	let models = modelConvertors(entities);
 	if (!models) {
@@ -29,7 +38,7 @@ const save = (mongomodel = mongoose.Model, modelconvertor = entity => entity, se
 	}
 };
 
-const fetch = (mongomodel = mongoose.Model, domainconvertor = entity => entity) => async (condition = new Object()) => {
+const fetch = (mongomodel, domainconvertor = entity => entity) => async (condition = new Object()) => {
 	const doc = await mongomodel.find(condition);
 	if (doc.length === 0) {
 		return null;
@@ -38,11 +47,12 @@ const fetch = (mongomodel = mongoose.Model, domainconvertor = entity => entity) 
 	return domainConvertors(doc);
 };
 
-const remove = (mongomodel = mongoose.Model) => async (condition = new Object()) => {
+const remove = mongomodel => async (condition = new Object()) => {
 	return (await mongomodel.remove(condition)).n > 0;
 };
 
 module.exports = {
+	model: model,
 	save: save,
 	fetch: fetch,
 	remove: remove,

@@ -1,4 +1,3 @@
-
 'use strict';
 const sql = require('mssql');
 const MAXWAITTIMETOCONNECT = 10000; // Give max 10secs for sql server to open a connection pool

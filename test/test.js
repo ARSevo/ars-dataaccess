@@ -1,12 +1,13 @@
+'use strict';
 const assert = require('assert');
-const { mongo, mongohelper, sql } = require('../index');
-const { mongoose } = mongo;
+const { mongo, sql } = require('../index');
 const testconfig = require('./config');
 
-const testSchema = new mongoose.Schema({
+const testSchema = new mongo.Schema({
 	name: String,
 	value: Number
-});
+}, { versionKey : false, timestamps: true });
+
 const sqlConnectionParams = new sql.ConnectionParams(
 	testconfig.sqlserverUser,
 	testconfig.sqlserverPwd,
@@ -14,7 +15,7 @@ const sqlConnectionParams = new sql.ConnectionParams(
 	testconfig.sqlServerDatabase
 );
 
-const testModel = mongoose.model('test', testSchema, 'testCollection');
+const testModel = mongo.model('test', testSchema, 'testCollection');
 const modelConverter = entity => {
 	const entityClone = { ...entity };
 	delete entityClone.Id;
@@ -25,7 +26,7 @@ const modelConverter = entity => {
 
 const domainConvertor = model => {
 	const { _doc } = model;
-	const clone = {..._doc};
+	const clone = { ..._doc };
 	delete clone._id;
 	delete clone.__v;
 	return clone;
@@ -34,10 +35,10 @@ const domainConvertor = model => {
 const selector = entity => ({
 	name: entity.name
 });
-const testModelSaver = mongohelper.save(testModel, modelConverter, selector);
-const testModelSaverDefault = mongohelper.save(testModel);
-const testModelRemover = mongohelper.remove(testModel);
-const testModelFetcher = mongohelper.fetch(testModel, domainConvertor);
+const testModelSaver = mongo.save(testModel, modelConverter, selector);
+const testModelSaverDefault = mongo.save(testModel);
+const testModelRemover = mongo.remove(testModel);
+const testModelFetcher = mongo.fetch(testModel, domainConvertor);
 
 after(async () => {
 	await testModelRemover({ name: 'test' });

@@ -22,9 +22,15 @@ const connect = async mongodbConnection => {
 	}
 };
 
+const { save, remove, fetch, model } = require('./mongohelper');
+
 module.exports = {
 	connect: connect,
-	mongoose: mongoose,
-	disconnect : async () => await mongoose.disconnect(),
+	save: save,
+	remove: remove,
+	fetch: fetch,
+	model: model(mongoose),
+	Schema: mongoose.Schema,
+	disconnect: async () => await mongoose.disconnect(),
 	mongoConnectionState: mongoConnectionState
 };
