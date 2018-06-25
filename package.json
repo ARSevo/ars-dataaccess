@@ -20,11 +20,11 @@
 	"license": "MIT",
 	"dependencies": {
 		"bluebird": "^3.5.1",
-		"mongoose": "^5.0.17",
+		"mongoose": "^5.1.6",
 		"mssql": "^4.1.0"
 	},
 	"devDependencies": {
 		"eslint": "^4.19.1",
-		"mocha": "^5.1.1"
+		"mocha": "^5.2.0"
 	}
 }
