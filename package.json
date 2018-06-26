@@ -5,7 +5,9 @@
 	"main": "index.js",
 	"types": "index.d.ts",
 	"scripts": {
-		"test": "mocha"
+		"test": "mocha",
+		"mockcoverage": "cross-env NODE_ENV=test nyc mocha test/mocktest.js",
+		"coveragereport": "nyc report --reporter=html"
 	},
 	"keywords": [
 		"dataaccess",
@@ -24,7 +26,10 @@
 		"mssql": "^4.1.0"
 	},
 	"devDependencies": {
+		"babel-plugin-istanbul": "^4.1.6",
+		"cross-env": "^5.2.0",
 		"eslint": "^4.19.1",
-		"mocha": "^5.2.0"
+		"mocha": "^5.2.0",
+		"nyc": "^12.0.2"
 	}
 }

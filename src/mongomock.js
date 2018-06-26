@@ -1,11 +1,12 @@
 /* eslint-disable */
 const mongo = require('./mongo');
+const { isArray } = require('util');
 let data = [];
 const connect = async mongodbConnection => {
 };
 
 const save = (mongoModel, modelConvertor, selector) => async entities => {
-	data.push(...entities);
+	isArray(entities) ? data.push(...entities) : data.push(entities);
 	return entities;
 };
 
@@ -32,7 +33,7 @@ const remove = mongoModel => async query => {
 };
 
 const fetch = (mongoModel, domainConvertor) => async query => {
-	return data.map(d => {
+	const fetchedData = data.map(d => {
 		for (const key in query) {
 			if (query.hasOwnProperty(key)) {
 				const element = query[key];
@@ -43,6 +44,8 @@ const fetch = (mongoModel, domainConvertor) => async query => {
 		}
 		return d;
 	}).filter(t => t !== undefined);
+
+	return fetchedData.length == 1 ? fetchedData[0] : fetchedData;
 };
 
 module.exports = {

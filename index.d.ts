@@ -1,14 +1,20 @@
 import mongoose from "mongoose";
+import mssql from 'mssql';
 
 type MongoModel = mongoose.Model<any>;
 export enum mongoConnectionState {
-		disconnected = 0,
-		connected = 1,
-		connecting = 2,
-		disconnecting = 3
-	}
+	disconnected = 0,
+	connected = 1,
+	connecting = 2,
+	disconnecting = 3
+}
 
 declare namespace mongo {
+	/**
+	 * Opens a connection to MongoDB with the given connection string
+	 * @param mongodbConnection Connection string URL for MongoDB
+	 * @returns Promise wrapped around boolean
+	 */
 	function connect(mongodbConnection: string): Promise<boolean>;
 	function model(name: string, schema: mongoose.Schema): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;
@@ -30,6 +36,21 @@ declare namespace mongomock {
 	function disconnect(): Promise<void>;
 }
 
+class ConnectionParams {
+	public user: string;
+	public password: string;
+	public server: string;
+	public database: string;
+	constructor(user: string, password: string, server: string, database: string);
+}
+
 declare namespace sql {
-	function connect(connectionParams) : Promise<any>;
+	const sql: mssql;
+	const transaction : mssql.Transaction;
+	const pool: mssql.ConnectionPool;
+	const ConnectionParams: ConnectionParams;
+	const request: mssql.Request;
+	function connect(connectionParams): Promise<any>;
+	function isConnected(): boolean;
+	function disconnect(): Promise<void>;
 }
