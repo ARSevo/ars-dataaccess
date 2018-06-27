@@ -34,7 +34,7 @@ const save = (mongomodel, modelconvertor = entity => entity, selector = () => Ob
 		}
 		await bulk.execute();
 	} else {
-		return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true });
+		return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
 	}
 };
 
