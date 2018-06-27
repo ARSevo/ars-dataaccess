@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import mssql from 'mssql';
 
 type MongoModel = mongoose.Model<any>;
@@ -10,6 +10,7 @@ export enum mongoConnectionState {
 }
 
 declare namespace mongo {
+	const Schema : Schema
 	/**
 	 * Opens a connection to MongoDB with the given connection string
 	 * @param mongodbConnection Connection string URL for MongoDB
@@ -26,6 +27,7 @@ declare namespace mongo {
 }
 
 declare namespace mongomock {
+	const Schema : Schema;
 	function connect(mongodbConnection: string): Promise<boolean>;
 	function model(name: string, schema: mongoose.Schema): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;

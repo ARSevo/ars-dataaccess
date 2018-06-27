@@ -1,17 +1,23 @@
 /* eslint-disable */
 const mongo = require('./mongo');
 const { isArray, isString } = require('util');
-let data = [];
+let database = {};
 const connect = async mongodbConnection => {
 	return isString(mongodbConnection);
 };
 
 const save = (mongoModel, modelConvertor, selector) => async entities => {
+	database[mongoModel.collection.name] = [];
+	let data = database[mongoModel.collection.name];
 	isArray(entities) ? data.push(...entities) : data.push(entities);
 	return entities;
 };
 
 const remove = mongoModel => async query => {
+	let data = database[mongoModel.collection.name];
+	if (!data) {
+		return false;
+	}
 	const initialLength = data.length;
 	data = data.map(d => {
 		let allPropMatch = true;
@@ -28,12 +34,13 @@ const remove = mongoModel => async query => {
 		}
 	});
 
-	data = data.filter(t => t !== undefined);
+	database[mongoModel.collection.name] = data.filter(t => t !== undefined);
 
-	return data.length < initialLength;
+	return database[mongoModel.collection.name].length < initialLength;
 };
 
 const fetch = (mongoModel, domainConvertor) => async query => {
+	let data = database[mongoModel.collection.name];
 	const fetchedData = data.map(d => {
 		for (const key in query) {
 			if (query.hasOwnProperty(key)) {

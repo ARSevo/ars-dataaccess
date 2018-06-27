@@ -1,8 +1,16 @@
 const assert = require('assert');
 const { mongomock } = require('../index');
-const saver = mongomock.save();
-const remover = mongomock.remove();
-const fetcher = mongomock.fetch();
+const testModelSchema= new mongomock.Schema({
+	a: Number,
+	b: Number,
+	c: Number,
+}, { versionKey: false, timestamps: true });
+
+const testModel = mongomock.model('testmodel', testModelSchema);
+
+const saver = mongomock.save(testModel);
+const remover = mongomock.remove(testModel);
+const fetcher = mongomock.fetch(testModel);
 
 const Entity = function (a, b, c) {
 	this.a = a;
