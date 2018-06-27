@@ -41,6 +41,9 @@ const remove = mongoModel => async query => {
 
 const fetch = (mongoModel, domainConvertor) => async query => {
 	let data = database[mongoModel.collection.name];
+	if (!data) {
+		return undefined;
+	}
 	const fetchedData = data.map(d => {
 		for (const key in query) {
 			if (query.hasOwnProperty(key)) {
