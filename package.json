@@ -1,6 +1,6 @@
 {
 	"name": "ars-dataaccess",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"description": "ars dataaccess for mongo and sql",
 	"main": "index.js",
 	"types": "index.d.ts",
