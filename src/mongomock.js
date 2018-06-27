@@ -1,8 +1,9 @@
 /* eslint-disable */
 const mongo = require('./mongo');
-const { isArray } = require('util');
+const { isArray, isString } = require('util');
 let data = [];
 const connect = async mongodbConnection => {
+	return isString(mongodbConnection);
 };
 
 const save = (mongoModel, modelConvertor, selector) => async entities => {

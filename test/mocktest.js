@@ -17,6 +17,15 @@ beforeEach(async () => {
 	assert.ok(savedData);
 });
 
+describe('mongo connect', function() {
+	it('should connect successfully', async () => {
+		assert.ok(await mongomock.connect('mongodbConnectionString'));
+	});
+	it('should fail on connect w/o connectionString', async () => {
+		assert.notEqual(await mongomock.connect(), true);
+	});
+});
+
 describe('mongo save', function () {
 	it('should save one entity', async () => {
 		const entity = new Entity(1, 1, 1);

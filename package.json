@@ -5,8 +5,7 @@
 	"main": "index.js",
 	"types": "index.d.ts",
 	"scripts": {
-		"test": "mocha",
-		"mockcoverage": "cross-env NODE_ENV=test nyc mocha test/mocktest.js",
+		"test": "cross-env NODE_ENV=test nyc mocha test/mocktest.js",
 		"coveragereport": "nyc report --reporter=html"
 	},
 	"keywords": [
