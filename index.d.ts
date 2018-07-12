@@ -38,7 +38,7 @@ declare namespace mongomock {
 	function disconnect(): Promise<void>;
 }
 
-class ConnectionParams {
+declare class ConnectionParams {
 	public user: string;
 	public password: string;
 	public server: string;
