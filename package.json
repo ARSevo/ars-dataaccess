@@ -21,7 +21,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"bluebird": "^3.5.1",
-		"mongoose": "^5.1.6",
+		"mongoose": "^5.2.3",
 		"mssql": "^4.1.0"
 	},
 	"devDependencies": {

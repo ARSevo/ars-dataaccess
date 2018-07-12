@@ -16,7 +16,8 @@ const connect = async mongodbConnection => {
 		await mongoose.connect(mongodbConnection, {
 			socketTimeoutMS: 30000,
 			connectTimeoutMS: 30000,
-			keepAlive: 1000
+			keepAlive: 1000,
+			useNewUrlParser: true
 		});
 		return isConnected(mongoose.connection.readyState);
 	}
