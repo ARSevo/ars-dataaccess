@@ -20,9 +20,9 @@
 	"author": "volem",
 	"license": "MIT",
 	"dependencies": {
-		"bluebird": "^3.5.1",
-		"mongoose": "^5.2.3",
-		"mssql": "^4.1.0"
+		"bluebird": "^3.5.2",
+		"mongoose": "^5.2.16",
+		"mssql": "^4.2.1"
 	},
 	"devDependencies": {
 		"babel-plugin-istanbul": "^4.1.6",
