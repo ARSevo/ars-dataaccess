@@ -14,7 +14,7 @@
 		"mongo"
 	],
 	"repository": {
-		"url": "https://github.com/Volem/ars-dataaccess.git",
+		"url": "https://github.com/ARSevo/ars-dataaccess.git",
 		"type": "git"
 	},
 	"author": "volem",
