@@ -67,7 +67,7 @@ module.exports = {
 	sql: sql,
 	pool: pool,
 	ConnectionParams: ConnectionParams,
-	request: new sql.Request(pool),
+	request: () => new sql.Request(pool),
 	connect: async connectionParams => {
 		init(connectionParams);
 		return await connect(pool);
