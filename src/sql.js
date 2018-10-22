@@ -65,7 +65,7 @@ const init = connectionParams => {
 
 module.exports = {
 	sql: sql,
-	pool: pool,
+	pool: () => pool,
 	ConnectionParams: ConnectionParams,
 	request: () => new sql.Request(pool),
 	connect: async connectionParams => {
