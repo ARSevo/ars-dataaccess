@@ -5,10 +5,10 @@ const util = require('util');
  * Creates a model/document definition for mongo
  * @param {string} name Model name. Used for collection name as plural
  * @param {Schema} schema mongoose Model schema
- * @param {string} collectionName Mongo collection name. Optional
+ * @param {string} collection Mongo collection name. Optional
  */
-const model = mongoose => (name, schema, collectionName = '') => {
-	const collectionName = collectionName || !name.endsWith('s') ? name + 's' : name;
+const model = mongoose => (name, schema, collection = '') => {
+	const collectionName = collection || !name.endsWith('s') ? name + 's' : name;
 	return mongoose.model(name, schema, collectionName);
 };
 

@@ -1,5 +1,5 @@
-'use strict';
 const mongoose = require('mongoose');
+require('mongoose-long')(mongoose);
 
 const mongoConnectionState = {
 	disconnected: 0,
