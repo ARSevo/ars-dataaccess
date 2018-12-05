@@ -51,7 +51,7 @@ declare namespace sql {
 	const transaction : mssql.Transaction;
 	const pool: mssql.ConnectionPool;
 	const ConnectionParams: ConnectionParams;
-	const request: mssql.Request;
+	function request(): mssql.Request;
 	function connect(connectionParams): Promise<any>;
 	function isConnected(): boolean;
 	function disconnect(): Promise<void>;
