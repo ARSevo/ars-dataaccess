@@ -24,6 +24,7 @@ declare namespace mongo {
 	function fetch(mongomodel: MongoModel, domainConvertor: (model: MongoModel) => Object): (query?: Object) => Promise<any>;
 	function fetch(mongomodel: MongoModel, domainConvertor: (model: MongoModel) => Object): (query?: Object) => Promise<any[]>;
 	function disconnect(): Promise<void>;
+	function validateObjectId(id: string): boolean;
 }
 
 declare namespace mongomock {

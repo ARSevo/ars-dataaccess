@@ -31,6 +31,14 @@ module.exports = {
 	remove: remove,
 	fetch: fetch,
 	model: model(mongoose),
+	validateObjectId: function (id) {
+		try {
+			new mongoose.Types.ObjectId(id);
+			return true;
+		} catch (ex) {
+			return false;
+		}
+	},
 	Schema: mongoose.Schema,
 	disconnect: async () => await mongoose.disconnect(),
 	mongoConnectionState: mongoConnectionState

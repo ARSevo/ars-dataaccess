@@ -6,7 +6,7 @@ const testconfig = require('./config');
 const testSchema = new mongo.Schema({
 	name: String,
 	value: Number
-}, { versionKey : false, timestamps: true });
+}, { versionKey: false, timestamps: true });
 
 const sqlConnectionParams = new sql.ConnectionParams(
 	testconfig.sqlserverUser,
@@ -40,14 +40,19 @@ const testModelSaverDefault = mongo.save(testModel);
 const testModelRemover = mongo.remove(testModel);
 const testModelFetcher = mongo.fetch(testModel, domainConvertor);
 
-after(async () => {
-	await testModelRemover({ name: 'test' });
-	await mongo.disconnect();
-	await sql.disconnect();
-	process.exit();
+describe('validators', function(){
+	it('should validate objectId', () => {
+		assert.equal(mongo.validateObjectId('test'), false);
+		assert.equal(mongo.validateObjectId('5c2231da4c89c67752521cab'), true);
+	});
 });
 
 describe('mongo', function () {
+	after(async () => {
+		await testModelRemover({ name: 'test' });
+		await mongo.disconnect();
+		process.exit();
+	});
 	it('should connect to mongo successfully', async () => {
 		try {
 			assert.ok(await mongo.connect(testconfig.mongodbConnection), 'failed to connect');
@@ -91,6 +96,10 @@ describe('mongo', function () {
 
 
 describe('sql', function () {
+	after(async () => {
+		await sql.disconnect();
+		process.exit();
+	});
 	it('should connect to sql successfully', async () => {
 		try {
 			assert.ok(await sql.connect(sqlConnectionParams), 'failed to connect');
