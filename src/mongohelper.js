@@ -22,7 +22,16 @@ const convertToMultiple = convertor => entities => {
 	return convertor(entities);
 };
 
-const save = (mongomodel, modelconvertor = entity => entity, selector = () => Object.freeze({})) => async entities => {
+const removeId = model => {
+	delete model.id;
+	delete model._id;
+	delete model._doc._id;
+	return model;
+};
+
+const removeIds = models => Array.isArray(models) ? models.map(t => removeId(t)) : removeId(models);
+
+const save = (mongomodel, modelconvertor = entity => entity, selector) => async entities => {
 	const modelConvertors = convertToMultiple(modelconvertor);
 	let models = modelConvertors(entities);
 	if (!models) {
@@ -35,7 +44,11 @@ const save = (mongomodel, modelconvertor = entity => entity, selector = () => Ob
 		}
 		await bulk.execute();
 	} else {
-		return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
+		if (selector) {
+			removeIds(models);
+			return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
+		}
+		return models.save();
 	}
 };
 
