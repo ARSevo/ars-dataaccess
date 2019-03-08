@@ -19,8 +19,8 @@ const connect = async mongodbConnection => {
 			keepAlive: 1000,
 			useNewUrlParser: true
 		});
-		return isConnected(mongoose.connection.readyState);
 	}
+	return isConnected(mongoose.connection.readyState);
 };
 
 const { save, remove, fetch, model } = require('./mongohelper');
