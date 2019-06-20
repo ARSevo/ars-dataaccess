@@ -17,7 +17,7 @@ declare namespace mongo {
 	 * @returns Promise wrapped around boolean
 	 */
 	function connect(mongodbConnection: string): Promise<boolean>;
-	function model(name: string, schema: mongoose.Schema): MongoModel;
+	function model(name: string, schema: mongoose.Schema,collection: string): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entities: any[]) => Promise<any[]>;
 	function remove(mongomodel: MongoModel): (query?: Object) => Promise<boolean>;
