@@ -1,12 +1,13 @@
 const assert = require('assert');
 const { mongomock } = require('../index');
-const testModelSchema= new mongomock.Schema({
+const testModelSchema = new mongomock.Schema({
 	a: Number,
 	b: Number,
 	c: Number,
 }, { versionKey: false, timestamps: true });
 
 const testModel = mongomock.model('testmodel', testModelSchema);
+const notExistCollection = mongomock.model('notexistcollection', testModelSchema);
 
 const saver = mongomock.save(testModel);
 const remover = mongomock.remove(testModel);
@@ -25,7 +26,7 @@ beforeEach(async () => {
 	assert.ok(savedData);
 });
 
-describe('mongo connect', function() {
+describe('mongo connect', function () {
 	it('should connect successfully', async () => {
 		assert.ok(await mongomock.connect('mongodbConnectionString'));
 	});
@@ -47,10 +48,20 @@ describe('mongo save', function () {
 });
 
 describe('mongo fetch', function () {
-	it('should fetch data', async () => {
+	it('should fetch all data', async () => {
 		const data = await fetcher();
 		assert.ok(data);
 		assert.equal(data.length, 2);
+	});
+	it('should return matched data', async () => {
+		const data = await fetcher({ a: 1 });
+		assert.ok(data);
+		assert.deepStrictEqual(data, new Entity(1, 2, 3));
+	});
+	it('should return undefined on a not found collection', async function () {
+		const undefinedFetcher = mongomock.fetch(notExistCollection);
+		const data = await undefinedFetcher();
+		assert.equal(data, undefined, 'should return undefined');
 	});
 });
 
@@ -66,5 +77,11 @@ describe('mongo mock remove', function () {
 	it('should not remove any data if no match', async () => {
 		assert.equal(await remover({ a: 3 }), false);
 		assert.equal(await remover({ d: 3 }), false);
+	});
+	it('should remove all matching data', async () => {
+		assert.ok(await remover({ b: 2 }));
+		const data = await fetcher();
+		assert.ok(data);
+		assert.strictEqual(data.length, 0);
 	});
 });
