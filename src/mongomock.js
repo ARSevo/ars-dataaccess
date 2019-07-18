@@ -1,16 +1,22 @@
 /* eslint-disable */
 const mongo = require('./mongo');
+const { convertToMultiple } = require('./mongohelper');
 const { isString } = require('util');
 let database = {};
 const connect = async mongodbConnection => {
 	return isString(mongodbConnection);
 };
 
-const save = (mongoModel, modelConvertor, selector) => async entities => {
+const save = (mongoModel,  modelconvertor = entity => entity, selector) => async entities => {
+	const modelConvertors = convertToMultiple(modelconvertor);
+	let models = modelConvertors(entities);
+	if (!models) {
+		return;
+	}
 	database[mongoModel.collection.name] = [];
 	let data = database[mongoModel.collection.name];
-	Array.isArray(entities) ? data.push(...entities) : data.push(entities);
-	return entities;
+	Array.isArray(models) ? data.push(...models) : data.push(models);
+	return models;
 };
 
 const remove = mongoModel => async query => {
@@ -37,7 +43,7 @@ const remove = mongoModel => async query => {
 	return database[mongoModel.collection.name].length < initialLength;
 };
 
-const fetch = (mongoModel, domainConvertor) => async query => {
+const fetch = (mongoModel, domainconvertor = entity => entity) => async (query = new Object()) => {
 	let data = database[mongoModel.collection.name];
 	if (!data) {
 		return undefined;
@@ -52,7 +58,11 @@ const fetch = (mongoModel, domainConvertor) => async query => {
 		return d;
 	}).filter(t => t !== undefined);
 
-	return fetchedData.length == 1 ? fetchedData[0] : fetchedData;
+	if (fetchedData.length === 0) {
+		return null;
+	}
+	const domainConvertors = convertToMultiple(domainconvertor);
+	return domainConvertors(fetchedData);
 };
 
 module.exports = {

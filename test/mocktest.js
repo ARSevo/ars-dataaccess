@@ -20,7 +20,7 @@ const Entity = function (a, b, c) {
 };
 
 beforeEach(async () => {
-	const data = [new Entity(1, 2, 3), new Entity(2, 2, 4)];
+	const data = [new Entity(1, 2, 3), new Entity(2, 2, 4), new Entity(7, 2, 0)];
 	await remover();
 	const savedData = await saver(data);
 	assert.ok(savedData);
@@ -51,7 +51,7 @@ describe('mongo fetch', function () {
 	it('should fetch all data', async () => {
 		const data = await fetcher();
 		assert.ok(data);
-		assert.equal(data.length, 2);
+		assert.equal(data.length, 3);
 	});
 	it('should return matched data', async () => {
 		const data = await fetcher({ a: 1 });
@@ -67,12 +67,12 @@ describe('mongo fetch', function () {
 
 describe('mongo mock remove', function () {
 	it('should remove data', async () => {
-		assert.ok(await remover({ c: 3, b: 2 }));
-		const data = await fetcher();
+		assert.ok(await remover({ c: 3, a: 1 }));
+		const data = await fetcher({ a: 7});
 		assert.ok(data);
-		assert.equal(data.a, 2);
+		assert.equal(data.a, 7);
 		assert.equal(data.b, 2);
-		assert.equal(data.c, 4);
+		assert.equal(data.c, 0);
 	});
 	it('should not remove any data if no match', async () => {
 		assert.equal(await remover({ a: 3 }), false);
@@ -81,7 +81,6 @@ describe('mongo mock remove', function () {
 	it('should remove all matching data', async () => {
 		assert.ok(await remover({ b: 2 }));
 		const data = await fetcher();
-		assert.ok(data);
-		assert.strictEqual(data.length, 0);
+		assert.strictEqual(data, null);
 	});
 });

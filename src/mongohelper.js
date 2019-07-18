@@ -66,8 +66,9 @@ const remove = mongomodel => async (condition = new Object()) => {
 };
 
 module.exports = {
-	model: model,
-	save: save,
-	fetch: fetch,
-	remove: remove,
+	model,
+	save,
+	fetch,
+	remove,
+	convertToMultiple
 };
