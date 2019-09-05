@@ -7,14 +7,89 @@ const connect = async mongodbConnection => {
 	return isString(mongodbConnection);
 };
 
-const save = (mongoModel,  modelconvertor = entity => entity, selector) => async entities => {
+const isMatchingObject = function (obj, query) {
+	for (const key in query) {
+		const element = query[key];
+		if (obj[key] != element) {
+			return undefined;
+		}
+	}
+	return true;
+};
+
+const noKeyQuery = function (query) {
+	return Object.keys(query).length === 0;
+}
+
+const isConditionalQuery = condition => query => query[condition];
+
+const isOrQuery = isConditionalQuery('$or');
+const isAndQuery = isConditionalQuery('$and');
+const isInQuery = isConditionalQuery('$in');
+
+const find = (collection, query) => {
+	if (noKeyQuery(query)) {
+		return collection;
+	}
+	const fetchedData = collection.reduce((pre, cur) => {
+		const orConditions = isOrQuery(query);
+		if (orConditions) {
+			for (let i = 0; i < orConditions.length; i++) {
+				const condition = orConditions[i];
+				if (isMatchingObject(cur, condition)) {
+					pre.push(cur)
+					return pre;
+				}
+			}
+		}
+		const andConditions = isAndQuery(query);
+		if (andConditions) {
+			for (let i = 0; i < andConditions.length; i++) {
+				const condition = andConditions[i];
+				if (!isMatchingObject(cur, condition)) {
+					return pre;
+				}
+			}
+			pre.push(cur);
+			return pre;
+		}
+		const inConditions = isInQuery(query);
+		if (inConditions) {
+			const key = Object.keys(inConditions)[0];
+			const keyValues = inConditions[key];
+
+			if(keyValues.includes(cur[key])){
+				pre.push(cur);
+				return pre;
+			}
+		}
+		if (isMatchingObject(cur, query)) {
+			pre.push(cur);
+		}
+		return pre;
+	}, []);
+
+	if (fetchedData.length === 0) {
+		return null;
+	}
+	return fetchedData;
+}
+
+const save = (mongoModel, modelconvertor = entity => entity, selector) => async entities => {
 	const modelConvertors = convertToMultiple(modelconvertor);
+	database[mongoModel.collection.name] = [];
+	let data = database[mongoModel.collection.name]
 	let models = modelConvertors(entities);
 	if (!models) {
 		return;
 	}
-	database[mongoModel.collection.name] = [];
-	let data = database[mongoModel.collection.name];
+	if (selector || !Array.isArray(models)) {
+		const existing = find(data, selector(models));
+		if (existing) {
+			existing = models;
+			return existing;
+		}
+	}
 	Array.isArray(models) ? data.push(...models) : data.push(models);
 	return models;
 };
@@ -48,21 +123,10 @@ const fetch = (mongoModel, domainconvertor = entity => entity) => async (query =
 	if (!data) {
 		return undefined;
 	}
-	const fetchedData = data.map(d => {
-		for (const key in query) {
-			const element = query[key];
-			if (d[key] != element) {
-				return undefined;
-			}
-		}
-		return d;
-	}).filter(t => t !== undefined);
-
-	if (fetchedData.length === 0) {
-		return null;
-	}
 	const domainConvertors = convertToMultiple(domainconvertor);
-	return domainConvertors(fetchedData);
+
+	const fetchedData = find(data, query);
+	return fetchedData && domainConvertors(fetchedData);
 };
 
 module.exports = {
