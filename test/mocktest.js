@@ -88,12 +88,12 @@ describe.only('mongo fetch', function () {
 		assert.equal(data3.c, 4);
 	});
 	it('should return multiple matched data with $in expression', async () => {
-		const data = await fetcher({ $in: { a: [1, 2, 3, 4, 5] } });
+		const data = await fetcher({ $in: ['a', [1, 2, 3, 4, 5]] });
 		assert.ok(data);
 		assert.equal(data.length, 3);
 	});
 	it('should return single matched data with $in expression', async () => {
-		const data = await fetcher({ $in: { c: [11, 2, 13, 14, 5] } });
+		const data = await fetcher({ $in: ['c', [11, 2, 13, 14, 5]] });
 		assert.ok(data);
 		assert.equal(data.c, 11);
 		assert.equal(data.a, 1);

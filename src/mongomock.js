@@ -55,8 +55,8 @@ const find = (collection, query) => {
 		}
 		const inConditions = isInQuery(query);
 		if (inConditions) {
-			const key = Object.keys(inConditions)[0];
-			const keyValues = inConditions[key];
+			const key = inConditions[0];
+			const keyValues = inConditions[1];
 
 			if(keyValues.includes(cur[key])){
 				pre.push(cur);
