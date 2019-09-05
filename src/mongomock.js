@@ -58,7 +58,7 @@ const find = (collection, query) => {
 			const key = inConditions[0];
 			const keyValues = inConditions[1];
 
-			if(keyValues.includes(cur[key])){
+			if (keyValues.includes(cur[key])) {
 				pre.push(cur);
 				return pre;
 			}
@@ -77,17 +77,21 @@ const find = (collection, query) => {
 
 const save = (mongoModel, modelconvertor = entity => entity, selector) => async entities => {
 	const modelConvertors = convertToMultiple(modelconvertor);
-	database[mongoModel.collection.name] = [];
+
+	if (!database[mongoModel.collection.name]) {
+		database[mongoModel.collection.name] = [];
+	};
 	let data = database[mongoModel.collection.name]
 	let models = modelConvertors(entities);
 	if (!models) {
 		return;
 	}
 	if (selector || !Array.isArray(models)) {
-		const existing = find(data, selector(models));
+		let existing = modelConvertors(find(data, selector(models)));
 		if (existing) {
-			existing = models;
-			return existing;
+			await remove(mongoModel)(existing);
+			database[mongoModel.collection.name].push(models);
+			return models;
 		}
 	}
 	Array.isArray(models) ? data.push(...models) : data.push(models);

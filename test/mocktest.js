@@ -9,7 +9,7 @@ const testModelSchema = new mongomock.Schema({
 const testModel = mongomock.model('testmodel', testModelSchema);
 const notExistCollection = mongomock.model('notexistcollection', testModelSchema);
 
-const saver = mongomock.save(testModel);
+const saver = mongomock.save(testModel, undefined, entity => ({ c: entity.c }));
 const remover = mongomock.remove(testModel);
 const fetcher = mongomock.fetch(testModel);
 
@@ -45,9 +45,18 @@ describe('mongo save', function () {
 		assert.ok(data);
 		assert.deepEqual(data, entity);
 	});
+	it('should update one entity', async () => {
+		const existing = await fetcher({ c: 11 });
+		const updaterObject = { ...existing };
+		updaterObject.b = 0;
+		const updated = await saver(updaterObject);
+		assert.equal(updated.b, 0);
+		const data = await fetcher({});
+		assert.equal(data.length, 4);
+	});
 });
 
-describe.only('mongo fetch', function () {
+describe('mongo fetch', function () {
 	it('should fetch all data', async () => {
 		const data = await fetcher();
 		assert.ok(data);
@@ -121,6 +130,6 @@ describe('mongo mock remove', function () {
 	it('should remove all matching data', async () => {
 		assert.ok(await remover({ b: 2 }));
 		const data = await fetcher();
-		assert.strictEqual(data, null);
+		assert.strictEqual(data, undefined);
 	});
 });
