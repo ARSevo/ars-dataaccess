@@ -20,7 +20,7 @@ const Entity = function (a, b, c) {
 };
 
 beforeEach(async () => {
-	const data = [new Entity(1, 2, 3), new Entity(2, 2, 4), new Entity(7, 2, 0)];
+	const data = [new Entity(1, 2, 3), new Entity(2, 2, 4), new Entity(7, 2, 0), new Entity(1, 2, 11)];
 	await remover();
 	const savedData = await saver(data);
 	assert.ok(savedData);
@@ -47,16 +47,56 @@ describe('mongo save', function () {
 	});
 });
 
-describe('mongo fetch', function () {
+describe.only('mongo fetch', function () {
 	it('should fetch all data', async () => {
 		const data = await fetcher();
 		assert.ok(data);
-		assert.equal(data.length, 3);
+		assert.equal(data.length, 4);
 	});
 	it('should return matched data', async () => {
-		const data = await fetcher({ a: 1 });
+		const data = await fetcher({ a: 7 });
 		assert.ok(data);
-		assert.deepStrictEqual(data, new Entity(1, 2, 3));
+		assert.deepStrictEqual(data, new Entity(7, 2, 0));
+	});
+	it('should return multiple matched data with $and expression', async () => {
+		const data = await fetcher({ $and: [{ a: 1 }, { b: 2 }] });
+		assert.ok(data);
+		assert.equal(data.length, 2);
+		const matched = data.find(t => t.c === 11);
+		assert.equal(matched.a, 1);
+	});
+	it('should return single matched data with $and expression', async () => {
+		const data = await fetcher({ $and: [{ a: 1 }, { c: 11 }, { b: 2 }] });
+		assert.ok(data);
+		assert.equal(data.a, 1);
+		assert.equal(data.b, 2);
+		assert.equal(data.c, 11);
+	});
+	it('should return single matched data with $or expression', async () => {
+		const data = await fetcher({ $or: [{ a: 0 }, { c: 4 }] });
+		assert.equal(data.a, 2);
+	});
+	it('should return multiple matched data with $or expression', async () => {
+		const data = await fetcher({ $or: [{ a: 1 }, { b: 2 }] });
+		assert.ok(data);
+		assert.ok(data.length === 4);
+		const data2 = data.filter(t => t.b === 2);
+		assert.ok(data2);
+		assert.equal(data2.length, 4);
+		const data3 = data.find(t => t.c === 4);
+		assert.ok(data3);
+		assert.equal(data3.c, 4);
+	});
+	it('should return multiple matched data with $in expression', async () => {
+		const data = await fetcher({ $in: { a: [1, 2, 3, 4, 5] } });
+		assert.ok(data);
+		assert.equal(data.length, 3);
+	});
+	it('should return single matched data with $in expression', async () => {
+		const data = await fetcher({ $in: { c: [11, 2, 13, 14, 5] } });
+		assert.ok(data);
+		assert.equal(data.c, 11);
+		assert.equal(data.a, 1);
 	});
 	it('should return undefined on a not found collection', async function () {
 		const undefinedFetcher = mongomock.fetch(notExistCollection);
@@ -68,7 +108,7 @@ describe('mongo fetch', function () {
 describe('mongo mock remove', function () {
 	it('should remove data', async () => {
 		assert.ok(await remover({ c: 3, a: 1 }));
-		const data = await fetcher({ a: 7});
+		const data = await fetcher({ a: 7 });
 		assert.ok(data);
 		assert.equal(data.a, 7);
 		assert.equal(data.b, 2);
