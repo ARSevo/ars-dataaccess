@@ -75,28 +75,40 @@ const find = (collection, query) => {
 	return fetchedData;
 }
 
+const convertId = query => {
+    const entity = Object.assign({}, query);
+    const doc = entity._doc || entity;
+    if (doc && query.id) {
+        doc._id = query.id;
+    }
+    return doc;
+};
+ 
+const convertIdInQuery = query => Array.isArray(query) ?
+    query.map(q => convertId(q)) : convertId(query);
+ 
 const save = (mongoModel, modelconvertor = entity => entity, selector) => async entities => {
-	const modelConvertors = convertToMultiple(modelconvertor);
-
-	if (!database[mongoModel.collection.name]) {
-		database[mongoModel.collection.name] = [];
-	};
-	const data = database[mongoModel.collection.name]
-	const models = modelConvertors(entities);
-	if (!models) {
-		return;
-	}
-	if (selector || !Array.isArray(models)) {
-		const existing = find(data, selector(models));
-		if (existing) {
-			const existingModel = modelConvertors(existing);
-			await remove(mongoModel)(selector(existingModel));
-			database[mongoModel.collection.name].push(models);
-			return models;
-		}
-	}
-	Array.isArray(models) ? data.push(...models) : data.push(models);
-	return models;
+    const modelConvertors = convertToMultiple(modelconvertor);
+ 
+    if (!database[mongoModel.collection.name]) {
+        database[mongoModel.collection.name] = [];
+    };
+    const data = database[mongoModel.collection.name]
+    const models = modelConvertors(entities);
+    if (!models) {
+        return;
+    }
+    if (selector || !Array.isArray(models)) {
+        const existing = find(data, selector(models));
+        if (existing) {
+            const existingModel = modelConvertors(existing);
+            await remove(mongoModel)(selector(existingModel));
+            database[mongoModel.collection.name].push(convertIdInQuery(entities));
+            return modelConvertors(entities);
+        }
+    }
+    Array.isArray(models) ? data.push(...convertIdInQuery(models)) : data.push(convertIdInQuery(models));
+    return models;
 };
 
 const remove = mongoModel => async query => {

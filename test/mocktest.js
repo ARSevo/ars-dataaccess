@@ -65,7 +65,9 @@ describe('mongo fetch', function () {
 	it('should return matched data', async () => {
 		const data = await fetcher({ a: 7 });
 		assert.ok(data);
-		assert.deepStrictEqual(data, new Entity(7, 2, 0));
+		assert.equal(data.a, 7);
+		assert.equal(data.b, 2);
+		assert.equal(data.c, 0);
 	});
 	it('should return multiple matched data with $and expression', async () => {
 		const data = await fetcher({ $and: [{ a: 1 }, { b: 2 }] });
