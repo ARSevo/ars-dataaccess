@@ -75,17 +75,18 @@ const find = (collection, query) => {
 	return fetchedData;
 }
 
-const convertId = query => {
-    const entity = Object.assign({}, query);
+const convertId = obj => {
+    const entity = Object.assign({}, obj);
     const doc = entity._doc || entity;
-    if (doc && query.id) {
-        doc._id = query.id;
+    if (doc && obj.id) {
+		doc.id = obj.id;
+        doc._id = obj.id;
     }
     return doc;
 };
  
-const convertIdInQuery = query => Array.isArray(query) ?
-    query.map(q => convertId(q)) : convertId(query);
+const convertIdInObject = obj => Array.isArray(obj) ?
+    obj.map(q => convertId(q)) : convertId(obj);
  
 const save = (mongoModel, modelconvertor = entity => entity, selector) => async entities => {
     const modelConvertors = convertToMultiple(modelconvertor);
@@ -104,11 +105,11 @@ const save = (mongoModel, modelconvertor = entity => entity, selector) => async 
 			const existingModel = modelConvertors(existing);
 			await remove(mongoModel)(selector(existingModel));
 			entities.id = existingModel.id;
-            database[mongoModel.collection.name].push(convertIdInQuery(entities));
+            database[mongoModel.collection.name].push(convertIdInObject(entities));
             return modelConvertors(entities);
         }
     }
-    Array.isArray(models) ? data.push(...convertIdInQuery(models)) : data.push(convertIdInQuery(models));
+    Array.isArray(models) ? data.push(...convertIdInObject(models)) : data.push(convertIdInObject(models));
     return models;
 };
 
