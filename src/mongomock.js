@@ -101,8 +101,9 @@ const save = (mongoModel, modelconvertor = entity => entity, selector) => async 
     if (selector || !Array.isArray(models)) {
         const existing = find(data, selector(models));
         if (existing) {
-            const existingModel = modelConvertors(existing);
-            await remove(mongoModel)(selector(existingModel));
+			const existingModel = modelConvertors(existing);
+			await remove(mongoModel)(selector(existingModel));
+			entities.id = existingModel.id;
             database[mongoModel.collection.name].push(convertIdInQuery(entities));
             return modelConvertors(entities);
         }
