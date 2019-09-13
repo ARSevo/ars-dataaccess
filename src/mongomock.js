@@ -19,13 +19,13 @@ const isMatchingObject = function (obj, query) {
 
 const noKeyQuery = function (query) {
 	return Object.keys(query).length === 0;
-}
+};
 
 const isConditionalQuery = condition => query => query[condition];
 
 const isOrQuery = isConditionalQuery('$or');
 const isAndQuery = isConditionalQuery('$and');
-const isInQuery = isConditionalQuery('$in');
+const isInQuery = query => JSON.stringify(query).includes('$in');
 
 const find = (collection, query) => {
 	if (noKeyQuery(query)) {
@@ -55,8 +55,8 @@ const find = (collection, query) => {
 		}
 		const inConditions = isInQuery(query);
 		if (inConditions) {
-			const key = inConditions[0];
-			const keyValues = inConditions[1];
+			const key = Object.keys(query)[0];
+			const keyValues = query[key]['$in'];
 
 			if (keyValues.includes(cur[key])) {
 				pre.push(cur);
