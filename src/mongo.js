@@ -17,7 +17,8 @@ const connect = async mongodbConnection => {
 			socketTimeoutMS: 30000,
 			connectTimeoutMS: 30000,
 			keepAlive: 1000,
-			useNewUrlParser: true
+			useNewUrlParser: true,
+			useUnifiedTopology: true
 		});
 	}
 	return isConnected(mongoose.connection.readyState);
