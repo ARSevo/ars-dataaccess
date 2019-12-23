@@ -48,17 +48,18 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 			removeIds(models);
 			return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
 		}
-		return models.save();
+		return [models.save()];
 	}
 };
 
-const fetch = (mongomodel, domainconvertor = entity => entity) => async (condition = new Object()) => {
-	const doc = await mongomodel.find(condition);
+const fetch = (mongomodel, domainconvertor = entity => entity, sorting = {}, includedFields = null) => async (condition = new Object()) => {
+	const doc = await mongomodel.find(condition, includedFields, sorting);
 	if (doc.length === 0) {
 		return null;
 	}
 	const domainConvertors = convertToMultiple(domainconvertor);
-	return domainConvertors(doc);
+	const converted = domainConvertors(doc);
+	return Array.isArray(converted) ? converted : [converted];
 };
 
 const remove = mongomodel => async (condition = new Object()) => {
