@@ -24,13 +24,15 @@ const connect = async mongodbConnection => {
 	return isConnected(mongoose.connection.readyState);
 };
 
-const { save, remove, fetch, model } = require('./mongohelper');
+const { save, remove, fetch, fetchById, paginate,  model } = require('./mongohelper');
 
 module.exports = {
-	connect: connect,
-	save: save,
-	remove: remove,
-	fetch: fetch,
+	connect,
+	save,
+	remove,
+	fetch,
+	fetchById,
+	paginate,
 	model: model(mongoose),
 	validateObjectId: function (id) {
 		try {

@@ -45,7 +45,7 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 			removeIds(models);
 			return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
 		}
-		return [models.save()];
+		return models.save();
 	}
 };
 
