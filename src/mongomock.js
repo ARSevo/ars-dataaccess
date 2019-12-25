@@ -76,41 +76,41 @@ const find = (collection, query) => {
 }
 
 const convertId = obj => {
-    const entity = Object.assign({}, obj);
-    const doc = entity._doc || entity;
-    if (doc && obj.id) {
+	const entity = Object.assign({}, obj);
+	const doc = entity._doc || entity;
+	if (doc && obj.id) {
 		doc.id = obj.id;
-        doc._id = obj.id;
-    }
-    return doc;
+		doc._id = obj.id;
+	}
+	return doc;
 };
- 
+
 const convertIdInObject = obj => Array.isArray(obj) ?
-    obj.map(q => convertId(q)) : convertId(obj);
- 
+	obj.map(q => convertId(q)) : convertId(obj);
+
 const save = (mongoModel, modelconvertor = entity => entity, selector) => async entities => {
-    const modelConvertors = convertToMultiple(modelconvertor);
- 
-    if (!database[mongoModel.collection.name]) {
-        database[mongoModel.collection.name] = [];
-    };
-    const data = database[mongoModel.collection.name]
-    const models = modelConvertors(entities);
-    if (!models) {
-        return;
-    }
-    if (selector || !Array.isArray(models)) {
-        const existing = find(data, selector(models));
-        if (existing) {
+	const modelConvertors = convertToMultiple(modelconvertor);
+
+	if (!database[mongoModel.collection.name]) {
+		database[mongoModel.collection.name] = [];
+	};
+	const data = database[mongoModel.collection.name]
+	const models = modelConvertors(entities);
+	if (!models) {
+		return;
+	}
+	if (selector || !Array.isArray(models)) {
+		const existing = find(data, selector(models));
+		if (existing) {
 			const existingModel = modelConvertors(existing);
 			await remove(mongoModel)(selector(existingModel));
 			entities.id = existingModel.id;
-            database[mongoModel.collection.name].push(convertIdInObject(entities));
-            return modelConvertors(entities);
-        }
-    }
-    Array.isArray(models) ? data.push(...convertIdInObject(models)) : data.push(convertIdInObject(models));
-    return models;
+			database[mongoModel.collection.name].push(convertIdInObject(entities));
+			return modelConvertors(entities);
+		}
+	}
+	Array.isArray(models) ? data.push(...convertIdInObject(models)) : data.push(convertIdInObject(models));
+	return models;
 };
 
 const remove = mongoModel => async query => {
@@ -142,18 +142,30 @@ const fetch = (mongoModel, domainconvertor = entity => entity) => async (query =
 	if (!data) {
 		return undefined;
 	}
+
 	const domainConvertors = convertToMultiple(domainconvertor);
 
 	const fetchedData = find(data, query);
 	return fetchedData && domainConvertors(fetchedData);
 };
 
+const paginate = (mongoModel, domainconvertor = entity => entity) => async (query = new Object()) => {
+	const docs = await fetch(mongoModel, domainconvertor)(query);
+
+	return { docs, count: docs ? docs.length : 0 };
+};
+
+const fetchById = (mongoModel, domainconvertor = entity => entity) => async id =>
+	await fetch(mongoModel, domainconvertor)({ _id: id });
+
 module.exports = {
 	connect: connect,
 	model: mongo.model,
-	save: save,
-	remove: remove,
-	fetch: fetch,
+	save,
+	remove,
+	fetch,
+	fetchById,
+	paginate,
 	Schema: mongo.Schema,
 	mongoConnectionState: mongo.mongoConnectionState,
 	disconnect: async () => { }

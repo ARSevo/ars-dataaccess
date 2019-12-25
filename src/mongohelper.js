@@ -1,6 +1,3 @@
-'use strict';
-const util = require('util');
-
 /**
  * Creates a model/document definition for mongo
  * @param {string} name Model name. Used for collection name as plural
@@ -13,7 +10,7 @@ const model = mongoose => (name, schema, collection = '') => {
 };
 
 const convertToMultiple = convertor => entities => {
-	if (util.isArray(entities)) {
+	if (Array.isArray(entities)) {
 		if (entities.length > 1) {
 			return entities.map(entity => convertor(entity));
 		}
@@ -37,7 +34,7 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 	if (!models) {
 		return;
 	}
-	if (util.isArray(models)) {
+	if (Array.isArray(models)) {
 		let bulk = mongomodel.collection.initializeOrderedBulkOp();
 		for (const model of models) {
 			bulk.find(selector(model)).upsert().updateOne(model);
@@ -52,14 +49,35 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 	}
 };
 
-const fetch = (mongomodel, domainconvertor = entity => entity, sorting = {}, includedFields = null) => async (condition = new Object()) => {
-	const doc = await mongomodel.find(condition, includedFields, sorting);
+const fetch = (mongomodel, domainconvertor = entity => entity) => async (condition = new Object()) => {
+	return await pureFetch(mongomodel, domainconvertor)(condition);
+};
+
+const fetchById = (mongomodel, domainconvertor = entity => entity) => async id => {
+	return await pureFetch(mongomodel, domainconvertor)({ _id: id });
+};
+
+const paginate = (mongomodel, domainconvertor = entity => entity) => async (condition = {}, paging = null, includedFields = null) => {
+	const count = await mongomodel.count(condition);
+
+	if (paging) {
+		paging.limit = paging.limit || 10;
+		paging.sort = paging.sort || { _id: 1 };
+		paging.skip = (!paging.page || paging.page === 0) ? 0 : (paging.page - 1) * paging.limit;
+	}
+
+	const docs = await pureFetch(mongomodel, domainconvertor)(condition, paging, includedFields) || [];
+	return { docs: Array.isArray(docs) ? docs : [docs], count, page: (paging.skip / paging.limit) + 1 };
+};
+
+const pureFetch = (mongomodel, domainconvertor = entity => entity) => async (condition = {}, paging = null, includedFields = null) => {
+	const doc = await mongomodel.find(condition, includedFields, paging);
 	if (doc.length === 0) {
 		return null;
 	}
+
 	const domainConvertors = convertToMultiple(domainconvertor);
-	const converted = domainConvertors(doc);
-	return Array.isArray(converted) ? converted : [converted];
+	return domainConvertors(doc);
 };
 
 const remove = mongomodel => async (condition = new Object()) => {
@@ -70,6 +88,8 @@ module.exports = {
 	model,
 	save,
 	fetch,
+	fetchById,
+	paginate,
 	remove,
 	convertToMultiple
 };
