@@ -10,14 +10,15 @@ export enum mongoConnectionState {
 }
 
 declare namespace mongo {
-	const Schema : Schema
+	const Schema: Schema
 	/**
 	 * Opens a connection to MongoDB with the given connection string
 	 * @param mongodbConnection Connection string URL for MongoDB
+	 * @param options Connection options for MongoDB
 	 * @returns Promise wrapped around boolean
 	 */
-	function connect(mongodbConnection: string): Promise<boolean>;
-	function model(name: string, schema: mongoose.Schema,collection: string): MongoModel;
+	function connect(mongodbConnection: string, options?: Object): Promise<boolean>;
+	function model(name: string, schema: mongoose.Schema, collection: string): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entities: any[]) => Promise<any[]>;
 	function remove(mongomodel: MongoModel): (query?: Object) => Promise<boolean>;
@@ -28,7 +29,7 @@ declare namespace mongo {
 }
 
 declare namespace mongomock {
-	const Schema : Schema;
+	const Schema: Schema;
 	function connect(mongodbConnection: string): Promise<boolean>;
 	function model(name: string, schema: mongoose.Schema): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;
@@ -49,7 +50,7 @@ declare class ConnectionParams {
 
 declare namespace sql {
 	const sql: mssql;
-	const transaction : mssql.Transaction;
+	const transaction: mssql.Transaction;
 	const pool: mssql.ConnectionPool;
 	const ConnectionParams: ConnectionParams;
 	function request(): mssql.Request;
