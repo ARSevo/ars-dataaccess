@@ -39,7 +39,7 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 		for (const model of models) {
 			bulk.find(selector(model)).upsert().updateOne(model);
 		}
-		await bulk.execute();
+		return await bulk.execute();
 	} else {
 		if (selector) {
 			removeIds(models);
