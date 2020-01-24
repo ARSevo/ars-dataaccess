@@ -10,10 +10,10 @@ const mongoConnectionState = {
 
 const isConnected = state => state === mongoConnectionState.connected || state === mongoConnectionState.connecting;
 
-const connect = async mongodbConnection => {
+const connect = async (mongodbConnection, options = null) => {
 	if (!isConnected(mongoose.connection.readyState)) {
 		mongoose.Promise = require('bluebird');
-		await mongoose.connect(mongodbConnection, {
+		await mongoose.connect(mongodbConnection, options || {
 			socketTimeoutMS: 30000,
 			connectTimeoutMS: 30000,
 			keepAlive: 1000,
@@ -24,7 +24,7 @@ const connect = async mongodbConnection => {
 	return isConnected(mongoose.connection.readyState);
 };
 
-const { save, remove, fetch, fetchById, paginate,  model } = require('./mongohelper');
+const { save, remove, fetch, fetchById, paginate, model } = require('./mongohelper');
 
 module.exports = {
 	connect,
