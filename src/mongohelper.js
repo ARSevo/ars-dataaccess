@@ -81,7 +81,7 @@ const pureFetch = (mongomodel, domainconvertor = entity => entity) => async (con
 };
 
 const remove = mongomodel => async (condition = new Object()) => {
-	return (await mongomodel.remove(condition)).n > 0;
+	return (await mongomodel.deleteMany(condition)).n > 0;
 };
 
 module.exports = {
