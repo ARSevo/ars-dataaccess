@@ -84,6 +84,10 @@ const remove = mongomodel => async (condition = new Object()) => {
 	return (await mongomodel.deleteMany(condition)).n > 0;
 };
 
+const copyTo = mongomodel => async copyTo => {
+	await mongomodel.aggregate([{ $match : {}}, { $out: copyTo }]);
+};
+
 module.exports = {
 	model,
 	save,
@@ -91,5 +95,6 @@ module.exports = {
 	fetchById,
 	paginate,
 	remove,
+	copyTo,
 	convertToMultiple
 };
