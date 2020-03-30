@@ -24,6 +24,7 @@ declare namespace mongo {
 	function remove(mongomodel: MongoModel): (query?: Object) => Promise<boolean>;
 	function fetch(mongomodel: MongoModel, domainConvertor: (model: MongoModel) => Object): (query?: Object) => Promise<any>;
 	function fetch(mongomodel: MongoModel, domainConvertor: (model: MongoModel) => Object): (query?: Object) => Promise<any[]>;
+	function copyTo(mongomodel: MongoModel): () => Promise<void>;
 	function disconnect(): Promise<void>;
 	function validateObjectId(id: string): boolean;
 }

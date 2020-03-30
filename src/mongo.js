@@ -24,7 +24,7 @@ const connect = async (mongodbConnection, options = null) => {
 	return isConnected(mongoose.connection.readyState);
 };
 
-const { save, remove, fetch, fetchById, paginate, model } = require('./mongohelper');
+const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./mongohelper');
 
 module.exports = {
 	connect,
