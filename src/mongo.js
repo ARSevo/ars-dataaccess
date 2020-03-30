@@ -33,6 +33,7 @@ module.exports = {
 	fetch,
 	fetchById,
 	paginate,
+	copyTo,
 	model: model(mongoose),
 	validateObjectId: function (id) {
 		try {
