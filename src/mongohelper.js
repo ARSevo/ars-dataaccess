@@ -19,15 +19,6 @@ const convertToMultiple = convertor => entities => {
 	return convertor(entities);
 };
 
-const removeId = model => {
-	delete model.id;
-	delete model._id;
-	delete model._doc._id;
-	return model;
-};
-
-const removeIds = models => Array.isArray(models) ? models.map(t => removeId(t)) : removeId(models);
-
 const save = (mongomodel, modelconvertor = entity => entity, selector) => async entities => {
 	const modelConvertors = convertToMultiple(modelconvertor);
 	let models = modelConvertors(entities);
@@ -42,8 +33,19 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 		return await bulk.execute();
 	} else {
 		if (selector) {
-			removeIds(models);
-			return await mongomodel.findOneAndUpdate(selector(models), models, { upsert: true, setDefaultsOnInsert: true, new: true });
+			const original = await pureFetch(mongomodel)(selector(models));
+			if (!original) {
+				return await models.save();
+			}
+			// We need to have the original dates to prevent overwriting updatedAt field.
+			// This will throw DocumentNotFoundError, because of the plugin (Concurrancy error)
+			const storedCreatedAt = new Date(original.createdAt);
+			const storedUpdatedAt = new Date(original.updatedAt);
+
+			original.overwrite(models);
+			original.createdAt = storedCreatedAt;
+			original.updatedAt = storedUpdatedAt;
+			return await original.save();
 		}
 		return models.save();
 	}
@@ -85,7 +87,7 @@ const remove = mongomodel => async (condition = new Object()) => {
 };
 
 const copyTo = mongomodel => async copyTo => {
-	await mongomodel.aggregate([{ $match : {}}, { $out: copyTo }]);
+	await mongomodel.aggregate([{ $match: {} }, { $out: copyTo }]);
 };
 
 module.exports = {
