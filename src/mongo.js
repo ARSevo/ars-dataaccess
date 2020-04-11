@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 require('mongoose-long')(mongoose);
 
+const { updateIfCurrentPlugin } = require('mongoose-update-if-current');
+
 const mongoConnectionState = {
 	disconnected: 0,
 	connected: 1,
 	connecting: 2,
 	disconnecting: 3
 };
+
+mongoose.plugin(updateIfCurrentPlugin, { strategy: 'timestamp' });
 
 const isConnected = state => state === mongoConnectionState.connected || state === mongoConnectionState.connecting;
 

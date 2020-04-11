@@ -20,10 +20,11 @@
 	"author": "volem",
 	"license": "MIT",
 	"dependencies": {
-		"bluebird": "^3.5.4",
-		"mongoose": "^5.7.3",
+		"bluebird": "^3.7.2",
+		"mongoose": "^5.9.7",
 		"mongoose-long": "^0.2.1",
-		"mssql": "^4.3.7"
+		"mongoose-update-if-current": "^1.4.0",
+		"mssql": "^4.3.8"
 	},
 	"devDependencies": {
 		"eslint": "^4.19.1",
