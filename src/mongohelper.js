@@ -41,11 +41,14 @@ const save = (mongomodel, modelconvertor = entity => entity, selector) => async 
 			// This will throw DocumentNotFoundError, because of the plugin (Concurrancy error)
 			const storedCreatedAt = new Date(original.createdAt);
 			const storedUpdatedAt = new Date(original.updatedAt);
+			const storedId = original._doc._id;
 
-			original.overwrite(models);
-			original.createdAt = storedCreatedAt;
-			original.updatedAt = storedUpdatedAt;
-			return await original.save();
+			models._doc._id = storedId;
+			models.isNew = false;
+			models.createdAt = storedCreatedAt;
+			models.updatedAt = storedUpdatedAt;
+
+			return await models.save();
 		}
 		return models.save();
 	}
