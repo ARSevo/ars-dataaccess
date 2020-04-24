@@ -146,7 +146,20 @@ const fetch = (mongoModel, domainconvertor = entity => entity) => async (query =
 	const domainConvertors = convertToMultiple(domainconvertor);
 
 	const fetchedData = find(data, query);
-	return fetchedData && domainConvertors(fetchedData);
+	if (fetchedData) {
+		const data = fetchedData.map(data => {
+			return {
+				...data,
+				save: async function () {
+					await remove(mongoModel)(data);
+					database[mongoModel.collection.name].push(convertIdInObject(this));
+				}
+			};
+		});
+		return domainConvertors(data);
+	}
+
+	return undefined;
 };
 
 const paginate = (mongoModel, domainconvertor = entity => entity) => async (query = new Object()) => {
