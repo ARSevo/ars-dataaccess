@@ -135,3 +135,33 @@ describe('mongo mock remove', function () {
 		assert.strictEqual(data, undefined);
 	});
 });
+
+describe.only('mongo mock save prototype for entity object', function () {
+	it('should return entity with save prototype', async () => {
+		const data = await fetcher({ a: 7 });
+		assert.ok(data);
+		assert.equal(data.a, 7);
+		assert.equal(data.b, 2);
+		assert.equal(data.c, 0);
+		assert.ok(data.save);
+	});
+	it('should update entity with new values', async () => {
+		const data = await fetcher({ a: 7 });
+		assert.ok(data);
+		assert.equal(data.a, 7);
+		assert.equal(data.b, 2);
+		assert.equal(data.c, 0);
+		assert.ok(data.save);
+
+		data.b = 11;
+		data.c = 12;
+		await data.save();
+
+		const updatedData = await fetcher({ a: 7 });
+		assert.ok(updatedData);
+		assert.equal(updatedData.a, 7);
+		assert.equal(updatedData.b, 11);
+		assert.equal(updatedData.c, 12);
+		assert.ok(updatedData.save);
+	});
+});
