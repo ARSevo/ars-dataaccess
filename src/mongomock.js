@@ -1,10 +1,9 @@
 /* eslint-disable */
 const mongo = require('./mongo');
 const { convertToMultiple } = require('./mongohelper');
-const { isString } = require('util');
 let database = {};
 const connect = async mongodbConnection => {
-	return isString(mongodbConnection);
+	return typeof mongodbConnection === 'string';
 };
 
 const isMatchingObject = function (obj, query) {

@@ -63,7 +63,7 @@ const fetchById = (mongomodel, domainconvertor = entity => entity) => async id =
 };
 
 const paginate = (mongomodel, domainconvertor = entity => entity) => async (condition = {}, paging = null, includedFields = null) => {
-	const count = await mongomodel.count(condition);
+	const count = await mongomodel.countDocuments(condition);
 
 	if (paging) {
 		paging.limit = paging.limit || 10;
