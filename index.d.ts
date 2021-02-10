@@ -45,8 +45,9 @@ declare class ConnectionParams {
 	public user: string;
 	public password: string;
 	public server: string;
+	public port: number;
 	public database: string;
-	constructor(user: string, password: string, server: string, database: string);
+	constructor(user: string, password: string, server: string, port: number, database: string);
 }
 
 declare namespace sql {
@@ -55,7 +56,7 @@ declare namespace sql {
 	const pool: mssql.ConnectionPool;
 	const ConnectionParams: ConnectionParams;
 	function request(): mssql.Request;
-	function connect(connectionParams): Promise<any>;
+	function connect(connectionParams: ConnectionParams): Promise<any>;
 	function isConnected(): boolean;
 	function disconnect(): Promise<void>;
 }

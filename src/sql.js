@@ -7,14 +7,16 @@ const MAXWAITTIMETOCONNECT = 10000; // Give max 10secs for sql server to open a 
  * @param {string} user Username to connect mssql server
  * @param {string} password Password to connect mssql server
  * @param {string} server Mssql server host endpoint
+ * @param {number} port Mssql server instance port
  * @param {string} database Database name on mssql server
  */
-const ConnectionParams = function (user, password, server, database) {
+const ConnectionParams = function (user, password, server, port = 1433, database) {
 	return {
-		user: user,
-		password: password,
-		server: server,
-		database: database
+		user,
+		password,
+		server,
+		port,
+		database,
 	};
 };
 
