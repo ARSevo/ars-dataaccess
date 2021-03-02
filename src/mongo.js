@@ -28,10 +28,15 @@ const connect = async (mongodbConnection, options = null) => {
 	return isConnected(mongoose.connection.readyState);
 };
 
+const stats = async () => {
+	return await mongoose.connection.db.stats({ scale: 1024 });
+};
+
 const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./mongohelper');
 
 module.exports = {
 	connect,
+	stats,
 	save,
 	remove,
 	fetch,
