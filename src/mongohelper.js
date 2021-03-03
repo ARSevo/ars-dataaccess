@@ -4,9 +4,9 @@
  * @param {Schema} schema mongoose Model schema
  * @param {string} collection Mongo collection name. Optional
  */
-const model = mongoose => (name, schema, collection = '') => {
+const model = connection => (name, schema, collection = '') => {
 	const collectionName = collection || (!name.endsWith('s') ? name + 's' : name);
-	return mongoose.model(name, schema, collectionName);
+	return connection.model(name, schema, collectionName);
 };
 
 const convertToMultiple = convertor => entities => {

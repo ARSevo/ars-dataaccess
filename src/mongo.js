@@ -43,8 +43,8 @@ const createConnection = async (mongodbConnection, name, options = null) => {
 	return isConnected(connection.readyState);
 };
 
-const stats = async () => {
-	return await mongoose.connection.db.stats({ scale: 1024 });
+const stats = async connection => {
+	return await connection.db.stats({ scale: 1024 });
 };
 
 const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./mongohelper');
@@ -61,6 +61,7 @@ module.exports = {
 	paginate,
 	copyTo,
 	model: model(mongoose),
+	multiConnectionModel : connection => model(connection),
 	validateObjectId: function (id) {
 		try {
 			new mongoose.Types.ObjectId(id);
