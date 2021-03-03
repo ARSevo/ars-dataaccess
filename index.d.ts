@@ -11,6 +11,7 @@ export enum mongoConnectionState {
 
 declare namespace mongo {
 	const Schema: Schema
+	const mongoConnections: Array<mongoose.Connection>
 	/**
 	 * Opens a connection to MongoDB with the given connection string
 	 * @param mongodbConnection Connection string URL for MongoDB
@@ -18,6 +19,7 @@ declare namespace mongo {
 	 * @returns Promise wrapped around boolean
 	 */
 	function connect(mongodbConnection: string, options?: Object): Promise<boolean>;
+	function createConnections(mongodbConnection: string, name: string, options?: Object): Promise<boolean>;
 	function stats(): Promise<any>;
 	function model(name: string, schema: mongoose.Schema, collection: string): MongoModel;
 	function save(mongomodel: MongoModel, modelconvertor: (entity) => MongoModel, selector: (entity) => Object): (entity) => Promise<any>;

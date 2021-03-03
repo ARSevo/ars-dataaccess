@@ -14,18 +14,33 @@ mongoose.plugin(updateIfCurrentPlugin, { strategy: 'timestamp' });
 
 const isConnected = state => state === mongoConnectionState.connected || state === mongoConnectionState.connecting;
 
+const defaultConnectionOptions = {
+	socketTimeoutMS: 30000,
+	connectTimeoutMS: 30000,
+	keepAlive: 1000,
+	useNewUrlParser: true,
+	useUnifiedTopology: true
+};
+
 const connect = async (mongodbConnection, options = null) => {
 	if (!isConnected(mongoose.connection.readyState)) {
 		mongoose.Promise = require('bluebird');
-		await mongoose.connect(mongodbConnection, options || {
-			socketTimeoutMS: 30000,
-			connectTimeoutMS: 30000,
-			keepAlive: 1000,
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		});
+		await mongoose.connect(mongodbConnection, options || defaultConnectionOptions);
 	}
 	return isConnected(mongoose.connection.readyState);
+};
+
+const mongoConnections = [];
+
+const createConnection = async (mongodbConnection, name, options = null) => {
+	mongoose.Promise = require('bluebird');
+	const namedConnection = mongoConnections.find(t => t.name === name);
+	if (namedConnection) {
+		return isConnected(namedConnection.readyState);
+	}
+	const connection = await mongoose.createConnection(mongodbConnection, options || defaultConnectionOptions);
+	mongoConnections.push({ name, connection });
+	return isConnected(connection.readyState);
 };
 
 const stats = async () => {
@@ -36,6 +51,8 @@ const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./m
 
 module.exports = {
 	connect,
+	mongoConnections,
+	createConnection,
 	stats,
 	save,
 	remove,
