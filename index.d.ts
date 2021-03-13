@@ -25,6 +25,7 @@ declare namespace mongo {
 	 */
 	function connect(mongodbConnection: string, options?: Object): Promise<boolean>;
 	function createConnection(mongodbConnection: string, name: string, options?: Object): Promise<boolean>;
+	function removeConnection(name: string): void;
 	function stats(): Promise<any>;
 	function model(name: string, schema: mongoose.Schema, collection: string): MongoModel;
 	function multiConnectionModel(connection: mongoose.Connection): (name: string, schema: mongoose.Schema, collection: string) => MongoModel;

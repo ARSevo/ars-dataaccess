@@ -30,7 +30,7 @@ const connect = async (mongodbConnection, options = null) => {
 	return isConnected(mongoose.connection.readyState);
 };
 
-const mongoConnections = [];
+let mongoConnections = [];
 
 const createConnection = async (mongodbConnection, name, options = null) => {
 	mongoose.Promise = require('bluebird');
@@ -43,6 +43,11 @@ const createConnection = async (mongodbConnection, name, options = null) => {
 	return isConnected(connection.readyState);
 };
 
+const removeConnection = name => {
+	mongoConnections = mongoConnections.filter(t => t.name !== name);
+	return mongoConnections;
+};
+
 const stats = async connection => {
 	return await connection.db.stats({ scale: 1024 });
 };
@@ -53,6 +58,7 @@ module.exports = {
 	connect,
 	mongoConnections,
 	createConnection,
+	removeConnection,
 	stats,
 	save,
 	remove,
@@ -61,7 +67,7 @@ module.exports = {
 	paginate,
 	copyTo,
 	model: model(mongoose),
-	multiConnectionModel : connection => model(connection),
+	multiConnectionModel: connection => model(connection),
 	validateObjectId: function (id) {
 		try {
 			new mongoose.Types.ObjectId(id);
