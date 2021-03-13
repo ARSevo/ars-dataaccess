@@ -39,8 +39,24 @@ const createConnection = async (mongodbConnection, name, options = null) => {
 };
 
 const removeConnection = async name => {
-	const connection = mongoose.connections.find(t => t.name === name);
-	await connection.close(true);
+	const connection = mongoose.connections.find(t => t.name === name && t.readyState === mongoConnectionState.connected);
+	await connection.close();
+};
+
+const createDatabase = async (mongodbConnection, dbName, testCollection = '_tc_', options = null) => {
+	const dbOptions = options || defaultConnectionOptions;
+	dbOptions.dbName = dbName;
+	const connection = await mongoose.createConnection(mongodbConnection, dbOptions);
+	await connection.createCollection(testCollection);
+	await connection.close();
+};
+
+const dropDatabase = async (mongodbConnection, dbName, options = null) => {
+	const dbOptions = options || defaultConnectionOptions;
+	dbOptions.dbName = dbName;
+	const connection = await mongoose.createConnection(mongodbConnection, dbOptions);
+	await connection.dropDatabase();
+	await connection.close();
 };
 
 const stats = async connection => {
@@ -51,9 +67,11 @@ const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./m
 
 module.exports = {
 	connect,
-	mongoConnections : mongoose.connections,
+	mongoConnections: mongoose.connections,
 	createConnection,
 	removeConnection,
+	createDatabase,
+	dropDatabase,
 	stats,
 	save,
 	remove,
