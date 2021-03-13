@@ -9,9 +9,14 @@ export enum mongoConnectionState {
 	disconnecting = 3
 }
 
+declare class MongoConnection {
+	public name: string;
+	public connection: mongoose.Connection
+}
+
 declare namespace mongo {
 	const Schema: Schema
-	const mongoConnections: Array<mongoose.Connection>
+	const mongoConnections: Array<MongoConnection>
 	/**
 	 * Opens a connection to MongoDB with the given connection string
 	 * @param mongodbConnection Connection string URL for MongoDB
@@ -19,7 +24,7 @@ declare namespace mongo {
 	 * @returns Promise wrapped around boolean
 	 */
 	function connect(mongodbConnection: string, options?: Object): Promise<boolean>;
-	function createConnections(mongodbConnection: string, name: string, options?: Object): Promise<boolean>;
+	function createConnection(mongodbConnection: string, name: string, options?: Object): Promise<boolean>;
 	function stats(): Promise<any>;
 	function model(name: string, schema: mongoose.Schema, collection: string): MongoModel;
 	function multiConnectionModel(connection: mongoose.Connection): (name: string, schema: mongoose.Schema, collection: string) => MongoModel;
