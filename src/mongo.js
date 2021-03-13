@@ -30,22 +30,17 @@ const connect = async (mongodbConnection, options = null) => {
 	return isConnected(mongoose.connection.readyState);
 };
 
-let mongoConnections = [];
-
 const createConnection = async (mongodbConnection, name, options = null) => {
 	mongoose.Promise = require('bluebird');
-	const namedConnection = mongoConnections.find(t => t.name === name);
-	if (namedConnection) {
-		return isConnected(namedConnection.readyState);
-	}
-	const connection = await mongoose.createConnection(mongodbConnection, options || defaultConnectionOptions);
-	mongoConnections.push({ name, connection });
+	const dbOptions = options || defaultConnectionOptions;
+	dbOptions.dbName = name;
+	const connection = await mongoose.createConnection(mongodbConnection, dbOptions);
 	return isConnected(connection.readyState);
 };
 
-const removeConnection = name => {
-	mongoConnections = mongoConnections.filter(t => t.name !== name);
-	return mongoConnections;
+const removeConnection = async name => {
+	const connection = mongoose.connections.find(t => t.name === name);
+	await connection.close(true);
 };
 
 const stats = async connection => {
@@ -56,7 +51,7 @@ const { save, remove, fetch, fetchById, paginate, model, copyTo } = require('./m
 
 module.exports = {
 	connect,
-	mongoConnections,
+	mongoConnections : mongoose.connections,
 	createConnection,
 	removeConnection,
 	stats,
