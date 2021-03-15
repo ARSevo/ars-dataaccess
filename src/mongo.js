@@ -25,6 +25,7 @@ const defaultConnectionOptions = {
 const connect = async (mongodbConnection, options = null) => {
 	if (!isConnected(mongoose.connection.readyState)) {
 		mongoose.Promise = require('bluebird');
+		mongoose.set('useFindAndModify', false);
 		await mongoose.connect(mongodbConnection, options || defaultConnectionOptions);
 	}
 	return isConnected(mongoose.connection.readyState);
@@ -32,6 +33,7 @@ const connect = async (mongodbConnection, options = null) => {
 
 const createConnection = async (mongodbConnection, name, options = null) => {
 	mongoose.Promise = require('bluebird');
+	mongoose.set('useFindAndModify', false);
 	const dbOptions = options || defaultConnectionOptions;
 	dbOptions.dbName = name;
 	const connection = await mongoose.createConnection(mongodbConnection, dbOptions);
