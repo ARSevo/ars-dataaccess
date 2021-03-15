@@ -20,7 +20,6 @@ declare namespace mongo {
 	 */
 	function connect(mongodbConnection: string, options?: Object): Promise<boolean>;
 	function createConnection(mongodbConnection: string, name: string, options?: Object): Promise<boolean>;
-	function removeConnection(name: string): void;
 	function createDatabase(mongodbConnection: string, dbName: string, testCollection = '_tc_', options?: Object): Promise<void>;
 	function dropDatabase(mongodbConnection: string, dbName: string, options?: Object): Promise<void>;
 	function stats(): Promise<any>;

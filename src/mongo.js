@@ -38,11 +38,6 @@ const createConnection = async (mongodbConnection, name, options = null) => {
 	return isConnected(connection.readyState);
 };
 
-const removeConnection = async name => {
-	const connection = mongoose.connections.find(t => t.name === name && t.readyState === mongoConnectionState.connected);
-	await connection.close();
-};
-
 const createDatabase = async (mongodbConnection, dbName, testCollection = '_tc_', options = null) => {
 	const dbOptions = options || defaultConnectionOptions;
 	dbOptions.dbName = dbName;
@@ -69,7 +64,6 @@ module.exports = {
 	connect,
 	mongoConnections: mongoose.connections,
 	createConnection,
-	removeConnection,
 	createDatabase,
 	dropDatabase,
 	stats,
